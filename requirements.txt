@@ -1,4 +1,13 @@
 streamlit
 pandas
-numpy
+dnspython
+qrcode
+pillow
+requests
+joblib
 scikit-learn
+pandas
+numpy
+tldextract
+whois
+python-whois
