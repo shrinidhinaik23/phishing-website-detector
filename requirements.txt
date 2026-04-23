@@ -6,8 +6,8 @@ pillow
 requests
 joblib
 scikit-learn
-pandas
 numpy
 tldextract
 whois
 python-whois
+flask

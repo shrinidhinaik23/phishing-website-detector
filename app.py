@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from datetime import datetime
 import pandas as pd
+import requests
 
 st.set_page_config(page_title="LinkShield AI", layout="wide")
 
@@ -149,33 +150,39 @@ def get_scan_stats():
         "safe_urls": safe_urls
     }
 
-# ----------------------------
-# DUMMY PREDICTION FUNCTION
-# Replace this later with backend logic
-# ----------------------------
-def predict_url(url):
-    url = url.lower().strip()
 
-    if "login" in url or "verify" in url or "bank" in url:
-        return {
-            "status": "High Risk",
-            "high_risk": 83,
-            "suspicious": 47,
-            "safe_score": 12
-        }
-    elif "free" in url or "offer" in url or "bonus" in url:
+
+def predict_url(url):
+    try:
+        res = requests.post(
+            "http://127.0.0.1:5000/predict",
+            json={"url": url},
+            timeout=15
+        )
+
+        if res.status_code == 200:
+            data = res.json()
+            return {
+                "status": data.get("status", "Suspicious"),
+                "high_risk": data.get("high_risk", 30),
+                "suspicious": data.get("suspicious", 60),
+                "safe_score": data.get("safe_score", 20)
+            }
+        else:
+            return {
+                "status": "Suspicious",
+                "high_risk": 30,
+                "suspicious": 60,
+                "safe_score": 20
+            }
+
+    except Exception as e:
+        st.error(f"Backend connection failed: {e}")
         return {
             "status": "Suspicious",
-            "high_risk": 38,
-            "suspicious": 74,
-            "safe_score": 21
-        }
-    else:
-        return {
-            "status": "Safe",
-            "high_risk": 12,
-            "suspicious": 18,
-            "safe_score": 86
+            "high_risk": 30,
+            "suspicious": 60,
+            "safe_score": 20
         }
 
 # ----------------------------
